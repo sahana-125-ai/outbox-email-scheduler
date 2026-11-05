@@ -1,0 +1,242 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --brand: #00a63e;
+  --brand-ink: #0b4a24;
+  --surface: #f4f7f5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  @apply bg-white text-ink antialiased;
+  font-family: Inter, "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+::selection {
+  background: #b0e6c7;
+  color: #0b4a24;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d7dcd9;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b9c0bc;
+  background-clip: content-box;
+}
+
+input,
+textarea,
+select,
+button {
+  font: inherit;
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border border-[#e9ebe9] bg-white shadow-card;
+  }
+
+  .input {
+    @apply h-10 w-full rounded-lg border border-transparent bg-[#f4f7f5] px-3.5 text-[13px] text-ink outline-none transition placeholder:text-[#8f8f8f] focus:border-brand-400 focus:bg-white focus:ring-2 focus:ring-brand-100;
+  }
+
+  .textarea {
+    @apply w-full rounded-lg border border-transparent bg-[#f4f7f5] px-3.5 py-3 text-[13px] text-ink outline-none transition placeholder:text-[#8f8f8f] focus:border-brand-400 focus:bg-white focus:ring-2 focus:ring-brand-100;
+  }
+
+  .label {
+    @apply mb-1.5 block text-[11.5px] font-medium text-[#565656];
+  }
+
+  .hint {
+    @apply text-[11px] leading-5 text-[#8f8f8f];
+  }
+
+  .nav-item {
+    @apply flex h-8 w-full items-center gap-2.5 rounded-md px-2.5 text-left text-[12.5px] font-medium text-[#565656] transition hover:bg-[#f4f7f5] hover:text-ink;
+  }
+
+  .nav-item-active {
+    @apply bg-[#e5f6ec] text-ink hover:bg-[#e5f6ec] hover:text-ink;
+  }
+
+  .divider {
+    @apply h-px w-full bg-hairline;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-[#e9ebe9] bg-white px-2.5 py-1 text-[11px] font-medium text-[#565656];
+  }
+
+  .table-head {
+    @apply text-left text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[#8f8f8f];
+  }
+
+  .field-row {
+    @apply flex items-center gap-3 border-b border-hairline py-3;
+  }
+
+  .field-label {
+    @apply w-[74px] shrink-0 text-[11.5px] font-medium text-[#8f8f8f];
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .grid-lines {
+    background-image:
+      linear-gradient(to right, rgba(0, 166, 62, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 166, 62, 0.05) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+}
+
+.skeleton {
+  @apply relative overflow-hidden rounded-lg bg-[#f1f3f2];
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.7) 40%,
+    rgba(255, 255, 255, 0.7) 60%,
+    rgba(255, 255, 255, 0)
+  );
+  animation: shimmer 1.6s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Rich email body rendered in the reading view --------------------------- */
+.email-body {
+  font-size: 13px;
+  line-height: 1.75;
+  color: #3a3a3a;
+  overflow-wrap: anywhere;
+}
+
+.email-body p {
+  margin: 0 0 14px;
+}
+
+.email-body p:last-child {
+  margin-bottom: 0;
+}
+
+.email-body a {
+  color: #007a2e;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.email-body ul,
+.email-body ol {
+  margin: 0 0 14px;
+  padding-left: 20px;
+}
+
+.email-body ul {
+  list-style: disc;
+}
+
+.email-body ol {
+  list-style: decimal;
+}
+
+.email-body li {
+  margin-bottom: 4px;
+}
+
+.email-body blockquote {
+  margin: 0 0 14px;
+  border-radius: 6px;
+  background: #fefce8;
+  padding: 12px 14px;
+  color: #3a3a3a;
+}
+
+.email-body mark {
+  border-radius: 3px;
+  background: #fefce8;
+  color: inherit;
+  padding: 0 2px;
+}
+
+.email-body h1,
+.email-body h2,
+.email-body h3 {
+  margin: 0 0 12px;
+  font-weight: 600;
+  color: #1e1e1e;
+}
+
+.email-body img {
+  height: auto;
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+.email-body table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.email-body td,
+.email-body th {
+  border: 1px solid #e3e3e3;
+  padding: 6px 8px;
+  text-align: left;
+}
+
+.email-body hr {
+  margin: 18px 0;
+  border: 0;
+  border-top: 1px solid #e3e3e3;
+}
