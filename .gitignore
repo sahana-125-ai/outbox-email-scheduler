@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+dist/
+.next/
+out/
+build/
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Prisma
+backend/prisma/*.db
+backend/prisma/*.db-journal
+
+# Test output
+coverage/
+playwright-report/
+test-results/
+
+# Docker
+postgres_data/
+redis_data/
+elasticsearch_data/
+
+# Misc
+*.tsbuildinfo
+next-env.d.ts
