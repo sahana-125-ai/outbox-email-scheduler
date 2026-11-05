@@ -1,0 +1,131 @@
+name: outbox
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: email_scheduler
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d email_scheduler"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  # Optional: start with `docker compose --profile search up`.
+  # The API automatically falls back to PostgreSQL when this is absent.
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    profiles: ["search"]
+    restart: unless-stopped
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      JWT_SECRET: ${JWT_SECRET:-demo-outbox-jwt-secret-change-me-please-32chars}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-demo-outbox-encryption-key-change-me}
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/email_scheduler
+      REDIS_URL: redis://redis:6379
+      SEARCH_ENABLED: ${SEARCH_ENABLED:-false}
+      ELASTICSEARCH_NODE: http://elasticsearch:9200
+      DEMO_MODE: ${DEMO_MODE:-true}
+      DEMO_USER_EMAIL: ${DEMO_USER_EMAIL:-demo@outbox.dev}
+      DEMO_USER_NAME: ${DEMO_USER_NAME:-Oliver Brown}
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-5}
+      MIN_DELAY_BETWEEN_EMAILS_MS: ${MIN_DELAY_BETWEEN_EMAILS_MS:-2000}
+      DEFAULT_MAX_EMAILS_PER_HOUR_PER_SENDER: ${DEFAULT_MAX_EMAILS_PER_HOUR_PER_SENDER:-200}
+      EMAIL_TRANSPORT: ${EMAIL_TRANSPORT:-smtp}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  worker:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    command: ["node", "dist/queue/emailWorker.js"]
+    environment:
+      NODE_ENV: production
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      JWT_SECRET: ${JWT_SECRET:-demo-outbox-jwt-secret-change-me-please-32chars}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-demo-outbox-encryption-key-change-me}
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/email_scheduler
+      REDIS_URL: redis://redis:6379
+      SEARCH_ENABLED: ${SEARCH_ENABLED:-false}
+      ELASTICSEARCH_NODE: http://elasticsearch:9200
+      DEMO_MODE: ${DEMO_MODE:-true}
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-5}
+      MIN_DELAY_BETWEEN_EMAILS_MS: ${MIN_DELAY_BETWEEN_EMAILS_MS:-2000}
+      DEFAULT_MAX_EMAILS_PER_HOUR_PER_SENDER: ${DEFAULT_MAX_EMAILS_PER_HOUR_PER_SENDER:-200}
+      EMAIL_TRANSPORT: ${EMAIL_TRANSPORT:-smtp}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:5000}
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
+  elasticsearch_data:
