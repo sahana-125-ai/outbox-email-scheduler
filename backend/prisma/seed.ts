@@ -8,6 +8,7 @@ import { DEFAULT_JOB_OPTIONS, emailQueue } from "../src/queue/emailQueue";
 import { indexEmails } from "../src/modules/search/search.service";
 
 const COMPLETED_CAMPAIGN = "Product update · February";
+const COMPLETED_EARLY_ACCESS_CAMPAIGN = "Early access invitations · October";
 const SCHEDULED_CAMPAIGN = "Early access invitations";
 
 function html(title: string, paragraphs: string[]) {
@@ -145,6 +146,68 @@ async function seedCompletedCampaign(userId: string, senderId: string) {
   return campaign;
 }
 
+async function seedCompletedEarlyAccessCampaign(userId: string, senderId: string) {
+  const existing = await prisma.campaign.findFirst({
+    where: { userId, name: COMPLETED_EARLY_ACCESS_CAMPAIGN }
+  });
+  if (existing) return existing;
+
+  const recipients = [
+    ["ava.patel@lumenlabs.io", "Ava Patel"],
+    ["marcus.lee@stackhouse.dev", "Marcus Lee"],
+    ["elena.garcia@nueve.studio", "Elena Garcia"],
+    ["tom.harris@monolith.co", "Tom Harris"],
+    ["aisha.khan@meridian.org", "Aisha Khan"],
+    ["jonas.schmidt@flintworks.de", "Jonas Schmidt"],
+    ["ruby.tan@parcelpost.sg", "Ruby Tan"],
+    ["finn.obrien@harborline.ie", "Finn O'Brien"],
+    ["nadia.aziz@atelier7.ma", "Nadia Aziz"],
+    ["leo.martin@petitpresse.fr", "Léo Martin"],
+    ["grace.kim@seolstudio.kr", "Grace Kim"],
+    ["ian.macrae@highland.io", "Ian Macrae"]
+  ] as const;
+
+  const createdAt = new Date(Date.now() - 10 * 60 * 60 * 1000);
+  const delaySeconds = 120;
+
+  const campaign = await prisma.campaign.create({
+    data: {
+      userId,
+      senderId,
+      name: COMPLETED_EARLY_ACCESS_CAMPAIGN,
+      subject: "You're invited: Outbox early access",
+      body: html("You're invited: Outbox early access", [
+        "Hi there,",
+        "We're opening 50 seats to the Outbox early-access program. You'll get unlimited campaigns, per-sender rate limiting and real-time delivery analytics.",
+        "Reply with “count me in” and we'll send your invite."
+      ]),
+      status: "COMPLETED",
+      startTime: createdAt,
+      delaySeconds,
+      hourlyLimit: 200,
+      totalRecipients: recipients.length,
+      completedAt: new Date(createdAt.getTime() + recipients.length * delaySeconds * 1000),
+      createdAt,
+      jobs: {
+        create: recipients.map(([email, name], index) => ({
+          id: crypto.randomUUID(),
+          recipientEmail: email,
+          recipientName: name,
+          status: "SENT",
+          scheduledFor: new Date(createdAt.getTime() + index * delaySeconds * 1000),
+          sentAt: new Date(createdAt.getTime() + index * delaySeconds * 1000 + 2_000),
+          attempts: 1,
+          providerMessageId: `<seed-early-access-${index}@outbox.dev>`
+        }))
+      }
+    },
+    include: { jobs: true }
+  });
+
+  logger.info({ campaignId: campaign.id }, "Seeded completed early-access campaign");
+  return campaign;
+}
+
 async function seedScheduledCampaign(userId: string, senderId: string) {
   const existing = await prisma.campaign.findFirst({
     where: { userId, name: SCHEDULED_CAMPAIGN }
@@ -231,10 +294,13 @@ async function main() {
 
   const sender = await resolveSender(user.id);
   const completed = await seedCompletedCampaign(user.id, sender.id);
+  const completedEarlyAccess = await seedCompletedEarlyAccessCampaign(user.id, sender.id);
   const scheduled = await seedScheduledCampaign(user.id, sender.id);
 
   const allJobs = await prisma.emailJob.findMany({
-    where: { campaignId: { in: [completed.id, scheduled.id] } },
+    where: {
+      campaignId: { in: [completed.id, completedEarlyAccess.id, scheduled.id] }
+    },
     include: { campaign: { select: { subject: true, body: true } } }
   });
 

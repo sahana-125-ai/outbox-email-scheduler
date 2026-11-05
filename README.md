@@ -34,10 +34,10 @@ Then open **http://localhost:3000** and sign in with the demo account.
 | http://localhost:5000/admin/queues | Bull Board queue monitor |
 | http://localhost:5000/api/health | Health + dependency check |
 
-Seed two realistic campaigns (one completed, one scheduled) and a working Ethereal sender:
+The one-shot `seed` service loads three realistic campaigns (two completed, one scheduled) and a working Ethereal sender automatically on first run, so the dashboard has data as soon as it is ready. To re-run it manually:
 
 ```bash
-docker compose exec backend npm run db:seed
+docker compose run --rm seed
 ```
 
 ### Demo login
