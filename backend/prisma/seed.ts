@@ -176,7 +176,7 @@ async function seedScheduledCampaign(userId: string, senderId: string) {
       name: SCHEDULED_CAMPAIGN,
       subject: "You're invited: Outbox early access",
       body: html("You're invited: Outbox early access", [
-        "Hi {{name}},",
+        "Hi there,",
         "We're opening 50 seats to the Outbox early-access program. You'll get unlimited campaigns, per-sender rate limiting and real-time delivery analytics.",
         "Reply with “count me in” and we'll send your invite."
       ]),
