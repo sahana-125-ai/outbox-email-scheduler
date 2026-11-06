@@ -1,14 +1,14 @@
 import type { ApiEnvelope } from "./types";
 
 /**
- * The API is served by Express. In local development it runs on :5000, and in
- * Docker it is exposed on the same host. Cookies are sent with `credentials:
- * include`; the backend CORS config allows the dashboard origin.
+ * Requests go to the same origin by default. Next.js proxies `/api/*` to the
+ * Express service using the server-only `BACKEND_URL`, which keeps session
+ * cookies first-party and avoids CORS in every environment.
+ *
+ * Set NEXT_PUBLIC_API_URL only when the browser must call the API directly.
  */
-export const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000").replace(
-  /\/$/,
-  ""
-);
+const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL;
+export const API_URL = (configuredApiUrl ?? "").replace(/\/$/, "");
 
 export class ApiError extends Error {
   status: number;

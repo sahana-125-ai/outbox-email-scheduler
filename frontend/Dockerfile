@@ -16,10 +16,8 @@ FROM node:22-alpine AS build
 
 WORKDIR /app
 
-# Baked into the client bundle, so it must be reachable from the browser.
-ARG NEXT_PUBLIC_API_URL=http://localhost:5000
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-
+# The browser talks to this Next.js server only. API requests are proxied to
+# BACKEND_URL at runtime, so no API URL needs to be baked into the bundle.
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build

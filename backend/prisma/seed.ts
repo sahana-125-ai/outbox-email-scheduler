@@ -323,7 +323,7 @@ async function main() {
   console.log("  Outbox Scheduler seed complete");
   console.log(`  Demo login:  ${env.demoUserEmail}`);
   console.log(`  Sender:      ${sender.email} (${sender.provider})`);
-  console.log("  Open the dashboard, click “Fill demo credentials”, then “Login”.");
+  console.log("  Open the dashboard and sign in with the demo email and any password.");
   console.log("──────────────────────────────────────────────────────────\n");
 }
 

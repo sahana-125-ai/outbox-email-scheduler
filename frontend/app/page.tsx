@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { API_URL, api, backendUrl } from "@/lib/api";
+import { API_URL, api } from "@/lib/api";
 import type { AuthConfig } from "@/lib/types";
 import { GoogleIcon, Icon } from "@/components/ui/Icons";
 import { Spinner } from "@/components/ui";
@@ -124,12 +124,6 @@ export default function LoginPage() {
     }
   }
 
-  function fillDemoCredentials() {
-    setEmail(config?.demoEmail ?? "demo@outbox.dev");
-    setPassword("demo1234");
-    setNotice(null);
-  }
-
   if (checkingSession) {
     return (
       <main className="grid min-h-screen place-items-center bg-white">
@@ -213,49 +207,7 @@ export default function LoginPage() {
               </button>
             </form>
 
-            {config?.demoEnabled && (
-              <p className="mt-3 text-center text-[10px] text-[#a0a5a2]">
-                Exploring the demo?{" "}
-                <button
-                  type="button"
-                  onClick={fillDemoCredentials}
-                  className="font-medium text-brand-700 underline-offset-2 hover:underline"
-                >
-                  Fill demo credentials
-                </button>{" "}
-                — any password works.
-              </p>
-            )}
           </section>
-
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[10px] text-[#a0a5a2]">
-            <a
-              href={backendUrl("/api-docs")}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 transition hover:text-brand-700"
-            >
-              API docs <Icon name="external" size={10} />
-            </a>
-            <span className="text-[#e0e3e1]">·</span>
-            <a
-              href={backendUrl("/admin/queues")}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 transition hover:text-brand-700"
-            >
-              Queue monitor <Icon name="external" size={10} />
-            </a>
-            <span className="text-[#e0e3e1]">·</span>
-            <a
-              href={backendUrl("/api/health")}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 transition hover:text-brand-700"
-            >
-              Health <Icon name="external" size={10} />
-            </a>
-          </div>
         </div>
       </div>
     </main>

@@ -47,7 +47,7 @@ docker compose run --rm seed
 | Email | `demo@outbox.dev` |
 | Password | any value (demo mode) |
 
-The login screen has a **Fill demo credentials** shortcut. Google OAuth and Slack are optional; when their credentials are absent the app falls back gracefully instead of breaking the demo. `DEMO_MODE` is on by default in Compose.
+Sign in with the demo email and any password. Google OAuth and Slack are optional; when their credentials are absent the app falls back gracefully instead of breaking the demo. `DEMO_MODE` is on by default in Compose.
 
 To exercise the optional Elasticsearch path:
 
