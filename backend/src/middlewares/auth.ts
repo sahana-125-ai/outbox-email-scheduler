@@ -1,9 +1,11 @@
 import type { NextFunction, Request, Response } from "express";
 import { env } from "../config/env";
-import { verifyUserToken } from "../utils/tokens";
+import { readUserToken } from "../utils/tokens";
 
 export interface AuthRequest extends Request {
   userId?: string;
+  userName?: string;
+  userEmail?: string;
 }
 
 function extractToken(req: Request): string | null {
@@ -24,11 +26,13 @@ export function requireAuth(req: AuthRequest, res: Response, next: NextFunction)
     return res.status(401).json({ success: false, message: "Authentication required" });
   }
 
-  const userId = verifyUserToken(token);
-  if (!userId) {
+  const session = readUserToken(token);
+  if (!session) {
     return res.status(401).json({ success: false, message: "Invalid or expired session" });
   }
 
-  req.userId = userId;
+  req.userId = session.userId;
+  req.userName = session.name;
+  req.userEmail = session.email;
   next();
 }

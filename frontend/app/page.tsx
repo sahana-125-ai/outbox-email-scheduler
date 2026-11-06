@@ -71,8 +71,8 @@ export default function LoginPage() {
     };
   }, [router]);
 
-  async function signInWithDemo() {
-    await api.post("/api/auth/demo");
+  async function signInWithDemo(identityEmail?: string) {
+    await api.post("/api/auth/demo", identityEmail ? { email: identityEmail } : undefined);
     router.replace("/dashboard");
   }
 
@@ -90,7 +90,7 @@ export default function LoginPage() {
     setGoogleLoading(true);
     try {
       toast.success("Google OAuth is not configured — opening the demo workspace.");
-      await signInWithDemo();
+      await signInWithDemo(EMAIL_PATTERN.test(email.trim()) ? email.trim() : undefined);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Sign-in failed");
     } finally {
@@ -116,7 +116,7 @@ export default function LoginPage() {
 
     setEmailLoading(true);
     try {
-      await signInWithDemo();
+      await signInWithDemo(email.trim());
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Sign-in failed");
     } finally {

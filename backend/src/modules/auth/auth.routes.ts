@@ -15,6 +15,40 @@ import {
 const router = Router();
 
 const OAUTH_STATE_COOKIE = "outbox_oauth_state";
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * Demo mode keeps a single shared workspace (so all demo content is visible),
+ * but the identity shown in the UI comes from the address typed on the login
+ * screen instead of always being the seeded persona.
+ */
+function nameFromEmail(email: string): string {
+  const local = email.split("@")[0] ?? "";
+  const cleaned = local
+    .replace(/[._\-+]+/g, " ")
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/\d+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!cleaned) return local || "Guest";
+
+  return cleaned
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function demoIdentity(rawEmail: unknown): { email: string; name: string } {
+  const email = typeof rawEmail === "string" ? rawEmail.trim().toLowerCase() : "";
+
+  if (email && EMAIL_PATTERN.test(email) && email !== env.demoUserEmail.toLowerCase()) {
+    return { email, name: nameFromEmail(email) };
+  }
+
+  return { email: env.demoUserEmail, name: env.demoUserName };
+}
 
 router.get("/config", (_req, res) => {
   res.json({
@@ -144,10 +178,12 @@ router.get(
 
 router.post(
   "/demo",
-  asyncHandler(async (_req, res) => {
+  asyncHandler(async (req, res) => {
     if (!env.demoMode) {
       throw new AppError(403, "Demo login is disabled. Sign in with Google.");
     }
+
+    const identity = demoIdentity(req.body?.email);
 
     const user = await prisma.user.upsert({
       where: { email: env.demoUserEmail },
@@ -158,13 +194,17 @@ router.post(
       }
     });
 
-    res.cookie(env.cookieName, signUserToken(user.id), authCookieOptions());
+    res.cookie(
+      env.cookieName,
+      signUserToken(user.id, identity),
+      authCookieOptions()
+    );
     res.json({
       success: true,
       data: {
         id: user.id,
-        name: user.name,
-        email: user.email,
+        name: identity.name,
+        email: identity.email,
         avatarUrl: user.avatarUrl
       }
     });
@@ -183,7 +223,14 @@ router.get(
       res.clearCookie(env.cookieName, clearAuthCookieOptions());
       throw new AppError(401, "Session no longer valid");
     }
-    res.json({ success: true, data: user });
+    res.json({
+      success: true,
+      data: {
+        ...user,
+        name: req.userName || user.name,
+        email: req.userEmail || user.email
+      }
+    });
   })
 );
 
