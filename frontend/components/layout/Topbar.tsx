@@ -30,20 +30,20 @@ export default function Topbar({
 
   return (
     <header className="sticky top-0 z-20 bg-white">
-      <div className="flex h-[48px] items-center gap-1.5 px-2">
+      <div className="flex h-[48px] items-center px-[6px]">
         <button
           type="button"
           onClick={onMenu}
-          className="grid h-8 w-8 shrink-0 place-items-center rounded-md text-[#565656] transition hover:bg-[#f4f7f5] lg:hidden"
+          className="mr-1 grid h-7 w-7 shrink-0 place-items-center rounded text-[#475467] transition hover:bg-[#f4f7f5] lg:hidden"
           aria-label="Open navigation"
         >
-          <Icon name="menu" size={17} />
+          <Icon name="menu" size={16} />
         </button>
 
         <h1 className="sr-only">{title}</h1>
 
         <form
-          className="relative min-w-0 max-w-[468px] flex-1"
+          className="relative w-full max-w-[468px]"
           onSubmit={(event) => {
             event.preventDefault();
             submit();
@@ -52,37 +52,37 @@ export default function Topbar({
         >
           <Icon
             name="search"
-            size={14}
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#8f8f8f]"
+            size={12}
+            className="pointer-events-none absolute left-[10px] top-1/2 -translate-y-1/2 text-[#98a2b3]"
           />
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search"
             aria-label="Search emails"
-            className="h-[30px] w-full rounded-full bg-[#f4f7f5] pl-8 pr-3 text-[11.5px] text-ink outline-none transition placeholder:text-[#8f8f8f] focus:bg-white focus:ring-2 focus:ring-brand-100"
+            className="h-[26px] w-full rounded-md bg-[#f4f7f5] pl-[29px] pr-3 text-[11px] text-[#101828] outline-none transition placeholder:text-[#98a2b3] focus:ring-2 focus:ring-brand-100"
           />
         </form>
 
-        <div className="ml-auto flex items-center gap-0.5">
+        <div className="ml-auto flex items-center gap-2 pr-2">
           <button
             type="button"
             onClick={onRefresh}
             disabled={refreshing}
-            className="grid h-8 w-8 place-items-center rounded-md text-[#565656] transition hover:bg-[#f4f7f5] disabled:opacity-60"
+            className="grid h-6 w-6 place-items-center rounded text-[#98a2b3] transition hover:bg-[#f4f7f5] disabled:opacity-60"
             title="Refresh data"
             aria-label="Refresh data"
           >
-            {refreshing ? <Spinner size={14} /> : <Icon name="refresh" size={15} />}
+            {refreshing ? <Spinner size={12} /> : <Icon name="refresh" size={13} />}
           </button>
           <button
             type="button"
             onClick={onSettings}
-            className="grid h-8 w-8 place-items-center rounded-md text-[#565656] transition hover:bg-[#f4f7f5]"
+            className="grid h-6 w-6 place-items-center rounded text-[#98a2b3] transition hover:bg-[#f4f7f5]"
             title="Integrations and settings"
             aria-label="Integrations and settings"
           >
-            <Icon name="settings" size={15} />
+            <Icon name="settings" size={13} />
           </button>
         </div>
       </div>

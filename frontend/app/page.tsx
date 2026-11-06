@@ -139,75 +139,72 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-screen flex-col bg-white">
-      <div className="flex flex-1 items-center justify-center px-4 py-12">
-        <div className="w-full max-w-[348px] animate-slide-up">
-          <section className="rounded-[10px] border border-[#f0f1f0] bg-white px-5 py-6 shadow-[0_1px_2px_rgba(20,24,21,0.04),0_16px_40px_-32px_rgba(20,24,21,0.28)]">
-            <h1 className="text-[24px] font-semibold leading-none tracking-[-0.02em] text-[#1e1e1e]">
-              Login
-            </h1>
+      <div className="flex flex-1 items-center justify-center px-4 py-10">
+        <div className="w-full max-w-[344px] px-10 pb-[34px] pt-10 sm:translate-y-[30px]">
+          <h1 className="text-center text-[24px] font-semibold leading-[26px] tracking-[-0.02em] text-[#1c1c1c]">
+            Login
+          </h1>
 
-            {notice && (
-              <div className="mt-4 flex gap-2 rounded-md bg-[#fffaf2] px-2.5 py-2 text-[10.5px] leading-4 text-[#8a5310]">
-                <Icon name="info" size={12} className="mt-0.5 shrink-0" />
-                <span>{notice}</span>
-              </div>
-            )}
-
-            {configError && (
-              <div className="mt-4 flex gap-2 rounded-md bg-rose-50 px-2.5 py-2 text-[10.5px] leading-4 text-rose-700">
-                <Icon name="alert" size={12} className="mt-0.5 shrink-0" />
-                <span>{configError}</span>
-              </div>
-            )}
-
-            <button
-              type="button"
-              onClick={handleGoogle}
-              disabled={googleLoading}
-              className="mt-5 flex h-[33px] w-full items-center justify-center gap-2 rounded-md bg-[#e5f6ec] text-[12px] font-semibold text-[#0b4a24] transition hover:bg-[#d9f2e3] active:bg-[#ccecd9] disabled:opacity-60"
-            >
-              {googleLoading ? <Spinner size={13} /> : <GoogleIcon size={15} />}
-              Login with Google
-            </button>
-
-            <div className="my-4 flex items-center gap-3">
-              <span className="h-px flex-1 bg-[#f0f1f0]" />
-              <span className="text-[10px] font-medium text-[#8f8f8f]">
-                or sign up through email
-              </span>
-              <span className="h-px flex-1 bg-[#f0f1f0]" />
+          {notice && (
+            <div className="mt-4 flex gap-2 rounded-md bg-[#fffaf2] px-2.5 py-2 text-[10.5px] leading-4 text-[#8a5310]">
+              <Icon name="info" size={12} className="mt-0.5 shrink-0" />
+              <span>{notice}</span>
             </div>
+          )}
 
-            <form onSubmit={handleEmailLogin} className="space-y-2.5">
-              <input
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="Email ID"
-                autoComplete="email"
-                aria-label="Email ID"
-                className="h-[39px] w-full rounded-md border border-transparent bg-[#f4f7f5] px-3 text-[12px] text-[#1e1e1e] outline-none transition placeholder:text-[#8f8f8f] focus:border-brand-400 focus:bg-white focus:ring-2 focus:ring-brand-100"
-              />
-              <input
-                type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                placeholder="Password"
-                autoComplete="current-password"
-                aria-label="Password"
-                className="h-[39px] w-full rounded-md border border-transparent bg-[#f4f7f5] px-3 text-[12px] text-[#1e1e1e] outline-none transition placeholder:text-[#8f8f8f] focus:border-brand-400 focus:bg-white focus:ring-2 focus:ring-brand-100"
-              />
-              <button
-                type="submit"
-                disabled={emailLoading}
-                className="mt-1.5 flex h-[33px] w-full items-center justify-center gap-2 rounded-md bg-brand-500 text-[12px] font-semibold text-white transition hover:bg-brand-600 active:bg-brand-700 disabled:cursor-not-allowed disabled:bg-brand-300"
-              >
-                {emailLoading ? <Spinner size={13} /> : null}
-                Login
-              </button>
-            </form>
+          {configError && (
+            <div className="mt-4 flex gap-2 rounded-md bg-rose-50 px-2.5 py-2 text-[10.5px] leading-4 text-rose-700">
+              <Icon name="alert" size={12} className="mt-0.5 shrink-0" />
+              <span>{configError}</span>
+            </div>
+          )}
 
-          </section>
+          <button
+            type="button"
+            onClick={handleGoogle}
+            disabled={googleLoading}
+            className="mt-[21px] flex h-8 w-full items-center justify-center gap-2 rounded bg-[#e5f6ec] text-[12px] font-medium text-[#1c1c1c] transition hover:bg-[#d9f2e3] active:bg-[#ccecd9] disabled:opacity-60"
+          >
+            {googleLoading ? <Spinner size={13} /> : <GoogleIcon size={15} />}
+            Login with Google
+          </button>
+
+          <div className="my-4 flex items-center gap-3">
+            <span className="h-px flex-1 bg-[#f5f6f7]" />
+            <span className="whitespace-nowrap text-[8.5px] text-[#aaaaaa]">
+              or sign up through email
+            </span>
+            <span className="h-px flex-1 bg-[#f5f6f7]" />
+          </div>
+
+          <form onSubmit={handleEmailLogin}>
+            <input
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="Email ID"
+              autoComplete="email"
+              aria-label="Email ID"
+              className="h-[38px] w-full rounded bg-[#f4f7f5] px-3 text-[12px] text-[#1c1c1c] outline-none transition placeholder:text-[#7e8489] focus:ring-2 focus:ring-brand-100"
+            />
+            <input
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Password"
+              autoComplete="current-password"
+              aria-label="Password"
+              className="mt-2 h-[39px] w-full rounded bg-[#f4f7f5] px-3 text-[12px] text-[#1c1c1c] outline-none transition placeholder:text-[#7e8489] focus:ring-2 focus:ring-brand-100"
+            />
+            <button
+              type="submit"
+              disabled={emailLoading}
+              className="mt-5 flex h-[33px] w-full items-center justify-center gap-2 rounded bg-[#00a63e] text-[12px] font-medium text-white transition hover:bg-[#009237] active:bg-[#00802f] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {emailLoading ? <Spinner size={13} /> : null}
+              Login
+            </button>
+          </form>
         </div>
       </div>
     </main>

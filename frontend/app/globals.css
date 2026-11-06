@@ -156,9 +156,9 @@ button {
 
 /* Rich email body rendered in the reading view --------------------------- */
 .email-body {
-  font-size: 13px;
-  line-height: 1.75;
-  color: #3a3a3a;
+  font-size: 13.5px;
+  line-height: 1.95;
+  color: #1e2939;
   overflow-wrap: anywhere;
 }
 

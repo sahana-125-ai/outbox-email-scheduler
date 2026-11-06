@@ -4,8 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { api } from "@/lib/api";
 import type { EmailJob, EmailSenderSummary, User } from "@/lib/types";
-import { cn, formatDateTime, formatNumber, formatRelative, formatTime } from "@/lib/format";
-import { Button, ProviderBadge, Spinner, StatusBadge } from "@/components/ui";
+import { formatDateTime, formatNumber, formatRelative, formatTime } from "@/lib/format";
+import { Button, Spinner } from "@/components/ui";
 import { Icon } from "@/components/ui/Icons";
 
 interface EmailDetailViewProps {
@@ -99,7 +99,6 @@ export default function EmailDetailView({
   }
 
   const sender = email?.campaign?.sender ?? null;
-  const subject = email?.campaign?.subject ?? "Campaign email";
   const body = email?.campaign?.body ?? "";
   const safeBody = useMemo(() => sanitizeHtml(body), [body]);
   const attachments = useMemo(() => extractAttachments(body), [body]);
@@ -137,45 +136,25 @@ export default function EmailDetailView({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-white">
-      <div className="mx-auto w-full max-w-[1000px] px-5 pb-16 pt-4 sm:px-10">
-        {/* Top bar ------------------------------------------------------ */}
-        <div className="flex items-center justify-between">
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-[11.5px] font-medium text-[#565656] transition hover:bg-[#f4f7f5]"
-          >
-            <Icon name="arrow-left" size={15} />
-            Back
-          </button>
-          <div className="flex items-center gap-1">
-            {email?.previewUrl && (
-              <a
-                href={email.previewUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex h-8 items-center gap-1.5 rounded-md px-2.5 text-[11px] font-medium text-[#565656] transition hover:bg-[#f4f7f5]"
-              >
-                <Icon name="external" size={13} />
-                Preview
-              </a>
-            )}
-            <button
-              type="button"
-              onClick={() => setShowDetails((value) => !value)}
-              className="inline-flex h-8 items-center gap-1.5 rounded-md px-2.5 text-[11px] font-medium text-[#565656] transition hover:bg-[#f4f7f5]"
-            >
-              <Icon name="info" size={13} />
-              Details
-            </button>
-          </div>
-        </div>
+      <div className="relative mx-auto min-h-screen w-full max-w-[1005px] px-5 pb-16 pt-5 sm:px-[35px]">
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-5 top-5 grid h-6 w-6 place-items-center rounded text-[#475467] transition hover:bg-[#f4f7f5] sm:right-[45px]"
+          aria-label="Close email"
+        >
+          <Icon name="x" size={14} />
+        </button>
+
+        <h1 className="text-[20px] font-medium leading-6 tracking-[-0.01em] text-[#101828]">
+          {firstName}, hello there!
+        </h1>
 
         {loading ? (
-          <div className="mx-auto mt-20 max-w-[700px] space-y-4">
-            <div className="skeleton h-6 w-2/3" />
-            <div className="skeleton h-4 w-1/3" />
-            <div className="mt-8 space-y-2">
+          <div className="mx-auto mt-[52px] w-full max-w-[700px] space-y-4">
+            <div className="skeleton h-3 w-1/3" />
+            <div className="skeleton h-3 w-1/4" />
+            <div className="mt-8 space-y-3">
               <div className="skeleton h-3 w-full" />
               <div className="skeleton h-3 w-11/12" />
               <div className="skeleton h-3 w-4/5" />
@@ -183,7 +162,7 @@ export default function EmailDetailView({
             </div>
           </div>
         ) : error ? (
-          <div className="mx-auto mt-20 max-w-md rounded-lg border border-rose-200 bg-rose-50 px-4 py-4 text-[12px] text-rose-700">
+          <div className="mx-auto mt-[52px] max-w-md rounded-md border border-rose-200 bg-rose-50 px-4 py-4 text-[12px] text-rose-700">
             <div className="flex items-center gap-2">
               <Icon name="alert" size={15} />
               <span className="flex-1">{error}</span>
@@ -193,185 +172,149 @@ export default function EmailDetailView({
             </Button>
           </div>
         ) : email ? (
-          <>
-            {/* Subject / greeting --------------------------------------- */}
-            <h1 className="mt-7 text-[22px] font-semibold leading-tight tracking-[-0.02em] text-[#1e1e1e]">
-              {firstName}, hello there!
-            </h1>
-            <p className="mt-1 truncate text-[11px] text-[#a0a5a2]">{subject}</p>
-
-            {/* Email ---------------------------------------------------- */}
-            <article className="mx-auto mt-7 max-w-[720px]">
-              <header className="flex items-start gap-3">
-                <span
-                  className={cn(
-                    "grid h-[30px] w-[30px] shrink-0 place-items-center rounded-full text-[10px] font-bold text-white",
-                    email.status === "SENT"
-                      ? "bg-[#00c950]"
-                      : email.status === "FAILED"
-                        ? "bg-rose-500"
-                        : "bg-[#9a5b13]"
-                  )}
-                  aria-hidden="true"
+          <article className="mx-auto mt-[23px] w-full max-w-[700px] lg:ml-[143px]">
+            <header className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <p className="truncate text-[12px] font-semibold text-[#737a89]">
+                  {sender?.displayName || sender?.email || "Outbox sender"}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowDetails((value) => !value)}
+                  className="mt-[3px] inline-flex items-center gap-1 text-[10px] text-[#3a4352] transition hover:text-[#101828]"
                 >
-                  {initials(sender?.displayName || sender?.email || "Outbox")}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                    <p className="truncate text-[12.5px] font-semibold text-[#1e1e1e]">
-                      {sender?.displayName || sender?.email || "Outbox sender"}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => setShowDetails((value) => !value)}
-                      className="inline-flex items-center gap-0.5 text-[10.5px] text-[#8f8f8f] transition hover:text-[#1e1e1e]"
-                    >
-                      to me <Icon name="chevron-down" size={10} />
-                    </button>
-                  </div>
-                  <p className="truncate text-[10.5px] text-[#a0a5a2]">
-                    {sender?.email}
-                    <span className="mx-1.5 text-[#d0d4d1]">·</span>
-                    to {email.recipientName || email.recipientEmail}
+                  to me <Icon name="chevron-down" size={9} />
+                </button>
+              </div>
+              <p className="shrink-0 pt-px text-[10px] text-[#8f96a3]">
+                {email.sentAt
+                  ? formatSentDate(email.sentAt)
+                  : formatDateTime(email.scheduledFor)}
+              </p>
+            </header>
+
+            <div
+              className="email-body mt-5 text-[13.5px] leading-[1.95] text-[#1e2939]"
+              // Body is authored in the compose editor; scripts and inline
+              // event handlers are stripped before rendering.
+              dangerouslySetInnerHTML={{ __html: safeBody || "<p></p>" }}
+            />
+
+            {attachments.length > 0 && (
+              <div className="mt-7 flex flex-wrap gap-2">
+                {attachments.map((attachment, index) => (
+                  <a
+                    key={`${attachment.name}-${index}`}
+                    href={attachment.src}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex h-9 max-w-[230px] items-center gap-2 rounded-md bg-[#f9fafb] px-2.5 text-[10.5px] font-medium text-[#475467] transition hover:bg-[#f1f3f2]"
+                  >
+                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded bg-white text-[#98a2b3]">
+                      <Icon name="image" size={11} />
+                    </span>
+                    <span className="truncate">{attachment.name}</span>
+                  </a>
+                ))}
+              </div>
+            )}
+
+            {email.errorMessage && (
+              <div className="mt-7 rounded-md bg-rose-50 px-3 py-2.5">
+                <p className="text-[9.5px] font-semibold uppercase tracking-[0.08em] text-rose-600">
+                  Last error
+                </p>
+                <p className="mt-1 break-words font-mono text-[10.5px] leading-5 text-rose-800">
+                  {email.errorMessage}
+                </p>
+              </div>
+            )}
+
+            {showDetails && (
+              <section className="mt-8 rounded-md border border-[#eaecf0] bg-[#fbfcfb] p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#98a2b3]">
+                    Delivery details
                   </p>
-                </div>
-                <div className="shrink-0 text-right">
-                  <p className="text-[10.5px] text-[#8f8f8f]">
-                    {email.sentAt
-                      ? formatSentDate(email.sentAt)
-                      : formatDateTime(email.scheduledFor)}
-                  </p>
-                  <div className="mt-1 flex justify-end">
-                    <StatusBadge status={email.status} className="px-2 py-0.5 text-[9px]" />
-                  </div>
-                </div>
-              </header>
-
-              <div className="divider my-5" />
-
-              <div
-                className="email-body"
-                // Body is authored in the compose editor; scripts and inline
-                // event handlers are stripped before rendering.
-                dangerouslySetInnerHTML={{ __html: safeBody || "<p></p>" }}
-              />
-
-              {attachments.length > 0 && (
-                <div className="mt-7 flex flex-wrap gap-2">
-                  {attachments.map((attachment, index) => (
-                    <a
-                      key={`${attachment.name}-${index}`}
-                      href={attachment.src}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex h-9 max-w-[230px] items-center gap-2 rounded-md bg-[#f9fafb] px-2.5 text-[10.5px] font-medium text-[#565656] transition hover:bg-[#f1f3f2]"
-                    >
-                      <span className="grid h-5 w-5 shrink-0 place-items-center rounded bg-white text-[#8f8f8f]">
-                        <Icon name="image" size={11} />
-                      </span>
-                      <span className="truncate">{attachment.name}</span>
-                    </a>
-                  ))}
-                </div>
-              )}
-
-              {email.errorMessage && (
-                <div className="mt-7 rounded-md bg-rose-50 px-3 py-2.5">
-                  <p className="text-[9.5px] font-semibold uppercase tracking-[0.08em] text-rose-600">
-                    Last error
-                  </p>
-                  <p className="mt-1 break-words font-mono text-[10.5px] leading-5 text-rose-800">
-                    {email.errorMessage}
-                  </p>
-                </div>
-              )}
-
-              {/* Delivery details ------------------------------------- */}
-              {showDetails && (
-                <section className="mt-8 rounded-lg border border-[#f0f2f0] bg-[#fbfcfb] p-4">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#8f8f8f]">
-                      Delivery details
-                    </p>
+                  <div className="flex items-center gap-3">
+                    {email.previewUrl && (
+                      <a
+                        href={email.previewUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 text-[10px] font-medium text-[#98a2b3] transition hover:text-brand-700"
+                      >
+                        <Icon name="external" size={11} />
+                        Preview
+                      </a>
+                    )}
                     <button
                       type="button"
                       onClick={() => void copy(email.recipientEmail, "Recipient")}
-                      className="inline-flex items-center gap-1 text-[10px] font-medium text-[#8f8f8f] transition hover:text-brand-700"
+                      className="inline-flex items-center gap-1 text-[10px] font-medium text-[#98a2b3] transition hover:text-brand-700"
                     >
                       <Icon name="copy" size={11} />
                       Copy recipient
                     </button>
                   </div>
+                </div>
 
-                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                    <Meta label="Attempts" value={`${formatNumber(email.attempts)} / 3`} />
-                    <Meta
-                      label="Provider ID"
-                      value={email.providerMessageId ? truncateId(email.providerMessageId) : "—"}
-                      title={email.providerMessageId ?? undefined}
-                    />
-                    <Meta label="Campaign" value={email.campaign?.name || subject} />
-                    <Meta
-                      label="Sender provider"
-                      value={sender?.provider ? providerLabel(sender.provider) : "—"}
-                    />
-                  </div>
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  <Meta label="Attempts" value={`${formatNumber(email.attempts)} / 3`} />
+                  <Meta
+                    label="Provider ID"
+                    value={email.providerMessageId ? truncateId(email.providerMessageId) : "—"}
+                    title={email.providerMessageId ?? undefined}
+                  />
+                  <Meta
+                    label="Campaign"
+                    value={email.campaign?.name || email.campaign?.subject || "Campaign email"}
+                  />
+                  <Meta
+                    label="Sender provider"
+                    value={sender?.provider ? providerLabel(sender.provider) : "—"}
+                  />
+                </div>
 
-                  <div className="mt-4 space-y-2.5">
-                    {timeline.map((item, index) => (
-                      <div key={`${item.label}-${index}`} className="flex gap-2.5">
-                        <span
-                          className={cn(
-                            "mt-1 h-1.5 w-1.5 shrink-0 rounded-full",
-                            item.tone === "brand"
-                              ? "bg-brand-500"
-                              : item.tone === "rose"
-                                ? "bg-rose-500"
-                                : item.tone === "amber"
-                                  ? "bg-amber-500"
-                                  : "bg-[#c9cecb]"
-                          )}
-                        />
-                        <div className="min-w-0">
-                          <p className="text-[10.5px] font-medium text-[#565656]">{item.label}</p>
-                          <p className="text-[10px] text-[#a0a5a2]">{item.value}</p>
-                        </div>
+                <div className="mt-4 space-y-2.5">
+                  {timeline.map((item, index) => (
+                    <div key={`${item.label}-${index}`} className="flex gap-2.5">
+                      <span
+                        className={
+                          "mt-1 h-1.5 w-1.5 shrink-0 rounded-full " +
+                          (item.tone === "brand"
+                            ? "bg-brand-500"
+                            : item.tone === "rose"
+                              ? "bg-rose-500"
+                              : item.tone === "amber"
+                                ? "bg-amber-500"
+                                : "bg-[#c9cecb]")
+                        }
+                      />
+                      <div className="min-w-0">
+                        <p className="text-[10.5px] font-medium text-[#475467]">{item.label}</p>
+                        <p className="text-[10px] text-[#98a2b3]">{item.value}</p>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
+                </div>
 
-                  {email.status === "FAILED" && (
-                    <button
-                      type="button"
-                      onClick={retry}
-                      disabled={retrying}
-                      className="mt-4 inline-flex h-8 items-center gap-1.5 rounded-md bg-brand-500 px-3 text-[11px] font-semibold text-white transition hover:bg-brand-600 disabled:opacity-60"
-                    >
-                      {retrying ? <Spinner size={12} /> : <Icon name="refresh" size={12} />}
-                      Retry delivery
-                    </button>
-                  )}
-                </section>
-              )}
-
-              <div className="mt-10 flex items-center justify-center gap-2">
-                {email.status === "FAILED" && !showDetails && (
-                  <Button size="sm" icon="refresh" onClick={retry} loading={retrying}>
+                {email.status === "FAILED" && (
+                  <button
+                    type="button"
+                    onClick={retry}
+                    disabled={retrying}
+                    className="mt-4 inline-flex h-8 items-center gap-1.5 rounded bg-brand-500 px-3 text-[11px] font-semibold text-white transition hover:bg-brand-600 disabled:opacity-60"
+                  >
+                    {retrying ? <Spinner size={12} /> : <Icon name="refresh" size={12} />}
                     Retry delivery
-                  </Button>
+                  </button>
                 )}
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="h-8 rounded-md border border-[#e9ebe9] px-3 text-[11px] font-medium text-[#565656] transition hover:bg-[#f4f7f5]"
-                >
-                  Back to inbox
-                </button>
-              </div>
-            </article>
-          </>
+              </section>
+            )}
+          </article>
         ) : (
-          <div className="flex flex-col items-center gap-2 py-24 text-[12px] text-[#8f8f8f]">
+          <div className="flex flex-col items-center gap-2 py-24 text-[12px] text-[#98a2b3]">
             <Spinner size={16} className="text-brand-600" /> Loading…
           </div>
         )}
@@ -386,11 +329,11 @@ export default function EmailDetailView({
 
 function Meta({ label, value, title }: { label: string; value: string; title?: string }) {
   return (
-    <div className="rounded-md bg-white px-3 py-2 ring-1 ring-[#eef0ee]">
-      <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-[#a0a5a2]">
+    <div className="rounded bg-white px-3 py-2 ring-1 ring-[#eef0ee]">
+      <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-[#98a2b3]">
         {label}
       </p>
-      <p className="mt-0.5 truncate text-[10.5px] font-medium text-[#565656]" title={title}>
+      <p className="mt-0.5 truncate text-[10.5px] font-medium text-[#475467]" title={title}>
         {value}
       </p>
     </div>
@@ -400,16 +343,6 @@ function Meta({ label, value, title }: { label: string; value: string; title?: s
 /* -------------------------------------------------------------------------- */
 /* Helpers                                                                    */
 /* -------------------------------------------------------------------------- */
-
-function initials(value: string): string {
-  return value
-    .trim()
-    .split(/[\s.@_-]+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? "")
-    .join("");
-}
 
 function providerLabel(provider: string): string {
   return provider === "ETHEREAL" ? "Ethereal test inbox" : provider === "CONSOLE" ? "Console" : "SMTP";

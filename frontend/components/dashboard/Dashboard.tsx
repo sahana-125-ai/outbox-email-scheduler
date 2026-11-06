@@ -185,13 +185,10 @@ export default function Dashboard() {
       <Sidebar
         user={user}
         tab={tab}
-        stats={stats}
-        slack={slack}
         open={mobileNavOpen}
         onClose={() => setMobileNavOpen(false)}
         onNavigate={navigate}
         onCompose={() => setComposeOpen(true)}
-        onSlack={() => navigate("integrations")}
         onLogout={logout}
       />
 
@@ -205,7 +202,7 @@ export default function Dashboard() {
           onSettings={() => navigate("integrations")}
         />
 
-        <main className="px-2 pb-8">
+        <main className="pb-8">
           {(tab === "scheduled" || tab === "sent") && (
             <EmailsView
               key={tab}

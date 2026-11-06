@@ -1,40 +1,33 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { cn, formatNumber } from "@/lib/format";
-import type { EmailStats, SlackStatus, TabKey, User } from "@/lib/types";
+import { cn } from "@/lib/format";
+import type { TabKey, User } from "@/lib/types";
 import { Icon, type IconName } from "@/components/ui/Icons";
 
 interface NavItem {
   key: TabKey;
   label: string;
   icon: IconName;
-  badge?: number;
 }
 
 interface SidebarProps {
   user: User;
   tab: TabKey;
-  stats: EmailStats | null;
-  slack: SlackStatus | null;
   open: boolean;
   onClose: () => void;
   onNavigate: (tab: TabKey) => void;
   onCompose: () => void;
-  onSlack: () => void;
   onLogout: () => void;
 }
 
 export default function Sidebar({
   user,
   tab,
-  stats,
-  slack,
   open,
   onClose,
   onNavigate,
   onCompose,
-  onSlack,
   onLogout
 }: SidebarProps) {
   const [profileOpen, setProfileOpen] = useState(false);
@@ -49,19 +42,8 @@ export default function Sidebar({
   }, []);
 
   const core: NavItem[] = [
-    { key: "scheduled", label: "Scheduled", icon: "clock", badge: stats?.scheduled },
-    { key: "sent", label: "Sent", icon: "send", badge: stats?.sent }
-  ];
-
-  const workspace: NavItem[] = [
-    { key: "overview", label: "Overview", icon: "overview" },
-    { key: "campaigns", label: "Campaigns", icon: "megaphone", badge: stats?.activeCampaigns },
-    { key: "search", label: "Search", icon: "search" }
-  ];
-
-  const manage: NavItem[] = [
-    { key: "senders", label: "Senders", icon: "users", badge: stats?.senders },
-    { key: "integrations", label: "Integrations", icon: "settings" }
+    { key: "scheduled", label: "Scheduled", icon: "clock" },
+    { key: "sent", label: "Sent", icon: "send" }
   ];
 
   const navigate = (next: TabKey) => {
@@ -69,38 +51,6 @@ export default function Sidebar({
     setProfileOpen(false);
     onClose();
   };
-
-  const renderNav = (items: NavItem[]) =>
-    items.map((item) => {
-      const active = tab === item.key;
-      return (
-        <button
-          key={item.key}
-          type="button"
-          onClick={() => navigate(item.key)}
-          className={cn("nav-item", active && "nav-item-active")}
-          aria-current={active ? "page" : undefined}
-        >
-          <Icon
-            name={item.icon}
-            size={15}
-            strokeWidth={1.7}
-            className={active ? "text-[#0b4a24]" : "text-[#8f8f8f]"}
-          />
-          <span className="flex-1 truncate">{item.label}</span>
-          {typeof item.badge === "number" && item.badge > 0 && (
-            <span
-              className={cn(
-                "text-[10.5px] font-medium tabular-nums",
-                active ? "text-[#2f6b49]" : "text-[#8f8f8f]"
-              )}
-            >
-              {formatNumber(item.badge)}
-            </span>
-          )}
-        </button>
-      );
-    });
 
   const initials = (user.name || user.email)
     .trim()
@@ -114,7 +64,7 @@ export default function Sidebar({
     <>
       <div
         className={cn(
-          "fixed inset-0 z-30 bg-[#07150d]/25 backdrop-blur-[1px] transition-opacity lg:hidden",
+          "fixed inset-0 z-30 bg-[#07150d]/25 transition-opacity lg:hidden",
           open ? "opacity-100" : "pointer-events-none opacity-0"
         )}
         onClick={onClose}
@@ -128,47 +78,26 @@ export default function Sidebar({
         )}
       >
         {/* Brand ------------------------------------------------------- */}
-        <div className="flex h-[42px] items-center gap-2 px-2.5 pt-1">
-          <span className="grid h-[22px] w-[22px] place-items-center rounded-[6px] bg-[#1e1e1e] text-white">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect
-                x="3"
-                y="5"
-                width="18"
-                height="14"
-                rx="2.4"
-                stroke="currentColor"
-                strokeWidth="2.2"
-              />
-              <path
-                d="m4.5 7 7.5 6 7.5-6"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
-          <span className="text-[15px] font-bold tracking-[-0.02em] text-[#1e1e1e]">
-            outbox
-            <span className="text-brand-500">.</span>
+        <div className="flex h-[38px] shrink-0 items-center px-[17px]">
+          <span className="text-[20px] font-extrabold leading-none tracking-[-0.035em] text-[#0a0a0a]">
+            ONB
           </span>
           <button
             type="button"
             onClick={onClose}
-            className="ml-auto grid h-7 w-7 place-items-center rounded-md text-[#8f8f8f] hover:bg-surface lg:hidden"
+            className="ml-auto grid h-6 w-6 place-items-center rounded text-[#8f96a3] hover:bg-[#f4f7f5] lg:hidden"
             aria-label="Close navigation"
           >
-            <Icon name="x" size={14} />
+            <Icon name="x" size={13} />
           </button>
         </div>
 
         {/* Profile pill ----------------------------------------------- */}
-        <div className="relative px-2" ref={profileRef}>
+        <div className="relative shrink-0 px-[9px]" ref={profileRef}>
           <button
             type="button"
             onClick={() => setProfileOpen((value) => !value)}
-            className="flex h-10 w-full items-center gap-2 rounded-lg bg-[#f4f7f5] px-2 text-left transition hover:bg-[#eef2ef]"
+            className="flex h-[39px] w-full items-center gap-2 rounded-md bg-[#f4f7f5] pl-[9px] pr-2.5 text-left transition hover:bg-[#eef2ef]"
             aria-expanded={profileOpen}
             aria-label="Account menu"
           >
@@ -177,22 +106,22 @@ export default function Sidebar({
               <img
                 src={user.avatarUrl}
                 alt=""
-                className="h-[24px] w-[24px] rounded-full object-cover"
+                className="h-5 w-5 rounded-full object-cover"
               />
             ) : (
-              <span className="grid h-[24px] w-[24px] shrink-0 place-items-center rounded-full bg-[#0b4a24] text-[9px] font-bold text-white">
+              <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#0b4a24] text-[8px] font-bold text-white">
                 {initials || "?"}
               </span>
             )}
-            <span className="min-w-0 flex-1 truncate text-[11.5px] font-semibold text-[#1e1e1e]">
-              {user.name || user.email}
+            <span className="min-w-0 flex-1 truncate text-[11px] font-medium text-[#191919]">
+              {(user.name || user.email).split(" ")[0]}
             </span>
-            <Icon name="chevron-down" size={12} className="shrink-0 text-[#8f8f8f]" />
+            <Icon name="chevron-down" size={10} className="shrink-0 text-[#98a2b3]" />
           </button>
 
           {profileOpen && (
-            <div className="absolute left-2 right-2 top-[46px] z-50 overflow-hidden rounded-lg border border-[#e9ebe9] bg-white py-1 shadow-pop">
-              <p className="truncate px-3 pb-1 pt-1.5 text-[10.5px] text-[#8f8f8f]">
+            <div className="absolute left-[9px] right-[9px] top-[43px] z-50 overflow-hidden rounded-md border border-[#eaecf0] bg-white py-1 shadow-pop">
+              <p className="truncate px-3 pb-1 pt-1.5 text-[10px] text-[#98a2b3]">
                 {user.email}
               </p>
               <button
@@ -201,9 +130,9 @@ export default function Sidebar({
                   setProfileOpen(false);
                   void onLogout();
                 }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left text-[11.5px] font-medium text-[#565656] transition hover:bg-[#f4f7f5] hover:text-rose-600"
+                className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[11px] font-medium text-[#475467] transition hover:bg-[#f4f7f5] hover:text-rose-600"
               >
-                <Icon name="logout" size={13} />
+                <Icon name="logout" size={12} />
                 Sign out
               </button>
             </div>
@@ -211,57 +140,52 @@ export default function Sidebar({
         </div>
 
         {/* Compose ---------------------------------------------------- */}
-        <div className="px-2 pt-2">
+        <div className="shrink-0 px-[10px] pt-[9px]">
           <button
             type="button"
             onClick={() => {
               onCompose();
               onClose();
             }}
-            className="flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-brand-500 bg-white text-[12px] font-semibold text-brand-700 transition hover:bg-[#f2fbf6] active:bg-[#e5f6ec]"
+            className="flex h-[22px] w-full items-center justify-center rounded-[4px] border border-[#00a63e] bg-white text-[10px] font-semibold text-[#00a63e] transition hover:bg-[#f2fbf6] active:bg-[#e5f6ec]"
           >
-            <Icon name="plus" size={14} strokeWidth={2.2} />
             Compose
           </button>
         </div>
 
         {/* Navigation ------------------------------------------------- */}
-        <nav className="mt-4 flex-1 overflow-y-auto px-2 pb-4">
-          <p className="px-2.5 pb-1.5 text-[9.5px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">
+        <nav className="mt-[21px] flex-1 overflow-y-auto px-[9px] pb-4">
+          <p className="px-[11px] pb-[5px] text-[8px] font-semibold uppercase leading-none tracking-[0.08em] text-[#bfbfbf]">
             Core
           </p>
-          <div className="space-y-0.5">{renderNav(core)}</div>
-
-          <p className="px-2.5 pb-1.5 pt-5 text-[9.5px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">
-            Workspace
-          </p>
-          <div className="space-y-0.5">{renderNav(workspace)}</div>
-
-          <p className="px-2.5 pb-1.5 pt-5 text-[9.5px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">
-            Manage
-          </p>
-          <div className="space-y-0.5">{renderNav(manage)}</div>
+          <div className="space-y-0">
+            {core.map((item) => {
+              const active = tab === item.key;
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => navigate(item.key)}
+                  className={cn(
+                    "flex h-[24px] w-full items-center gap-2 rounded-[4px] px-[11px] text-left text-[11px] font-medium transition",
+                    active
+                      ? "bg-[#e5f6ec] text-[#101828]"
+                      : "text-[#475467] hover:bg-[#f4f7f5] hover:text-[#101828]"
+                  )}
+                  aria-current={active ? "page" : undefined}
+                >
+                  <Icon
+                    name={item.icon}
+                    size={11}
+                    strokeWidth={1.9}
+                    className={active ? "text-[#101828]" : "text-[#475467]"}
+                  />
+                  <span className="truncate">{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </nav>
-
-        {/* Footer ----------------------------------------------------- */}
-        <div className="px-2 pb-2">
-          <button
-            type="button"
-            onClick={onSlack}
-            className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left transition hover:bg-[#f4f7f5]"
-          >
-            <span
-              className={cn(
-                "h-1.5 w-1.5 shrink-0 rounded-full",
-                slack?.connected ? "bg-brand-500" : "bg-[#c9cecb]"
-              )}
-            />
-            <span className="min-w-0 flex-1 truncate text-[10.5px] font-medium text-[#8f8f8f]">
-              {slack?.connected ? "Slack alerts on" : "Slack not connected"}
-            </span>
-            <Icon name="arrow-right" size={11} className="text-[#b0b5b2]" />
-          </button>
-        </div>
       </aside>
     </>
   );

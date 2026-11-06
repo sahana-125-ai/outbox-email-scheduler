@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { EmailJob, EmailStats, PageMeta } from "@/lib/types";
 import { cn, formatNumber, formatTime } from "@/lib/format";
-import { Button, EmptyState, Spinner, StatusBadge } from "@/components/ui";
+import { Button, EmptyState, StatusBadge } from "@/components/ui";
 import { Icon } from "@/components/ui/Icons";
 
 interface EmailsViewProps {
@@ -61,9 +61,9 @@ export default function EmailsView({
   const rateLimited = stats?.rateLimited ?? 0;
 
   return (
-    <div className="pt-1">
+    <div>
       {isScheduled && rateLimited > 0 && (
-        <div className="mx-2 mb-2 flex items-center gap-2 rounded-lg border border-[#ffedd4] bg-[#fffaf2] px-3 py-2 text-[11px] text-[#8a5310]">
+        <div className="mx-4 mb-2 flex items-center gap-2 rounded-md border border-[#ffedd4] bg-[#fffaf2] px-3 py-2 text-[11px] text-[#8a5310]">
           <Icon name="clock" size={13} className="shrink-0" />
           <p>
             <span className="font-semibold">{formatNumber(rateLimited)}</span> email
@@ -74,7 +74,7 @@ export default function EmailsView({
       )}
 
       {error && (
-        <div className="mx-2 mb-2 flex flex-wrap items-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-[11.5px] text-rose-700">
+        <div className="mx-4 mb-2 flex flex-wrap items-center gap-2 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-[11.5px] text-rose-700">
           <Icon name="alert" size={13} />
           <span className="flex-1">{error}</span>
           <Button variant="secondary" size="sm" onClick={() => void load()}>
@@ -88,11 +88,11 @@ export default function EmailsView({
           {Array.from({ length: 10 }).map((_, index) => (
             <div
               key={index}
-              className="flex h-[46px] items-center gap-4 border-b border-[#f7f8f8] px-4"
+              className="flex h-[39px] items-center gap-4 border-b border-[#f9f9fa] px-4"
             >
-              <div className="skeleton h-3 w-[130px]" />
-              <div className="skeleton h-3 w-[70px]" />
-              <div className="skeleton h-3 flex-1" />
+              <div className="skeleton h-2.5 w-[130px]" />
+              <div className="skeleton h-2.5 w-[70px]" />
+              <div className="skeleton h-2.5 flex-1" />
             </div>
           ))}
         </div>
@@ -120,25 +120,47 @@ export default function EmailsView({
                 key={job.id}
                 type="button"
                 onClick={() => onOpenEmail(job.id)}
-                className="group grid h-[46px] w-full grid-cols-[minmax(150px,0.95fr)_140px_minmax(0,2.6fr)] items-center gap-4 border-b border-[#f7f8f8] px-4 text-left transition hover:bg-[#fafbfa]"
+                className="group flex h-[39px] w-full items-center border-b border-[#f9f9fa] px-4 text-left text-[11.5px] transition hover:bg-[#fafbfa]"
               >
-                <span className="truncate text-[12px] font-medium text-[#1e1e1e]">
-                  <span className="text-[#565656]">To: </span>
-                  {job.recipientName || job.recipientEmail}
-                </span>
-
-                <span className="min-w-0">
-                  <EmailTiming job={job} mode={mode} />
-                </span>
-
-                <span className="flex min-w-0 items-baseline gap-1.5 truncate text-[12px]">
-                  <span className="shrink-0 truncate font-medium text-[#1e1e1e]">
-                    {job.campaign?.subject ?? "Campaign email"}
-                  </span>
-                  <span className="truncate font-normal text-[#8f8f8f]">
-                    — {snippet(job.campaign?.body ?? "", 150, job.campaign?.subject)}
+                <span className="w-[147px] shrink-0 truncate">
+                  <span className="text-[#475467]">To: </span>
+                  <span className="font-medium text-[#101828]">
+                    {job.recipientName || job.recipientEmail}
                   </span>
                 </span>
+
+                {isScheduled ? (
+                  <>
+                    <span className="w-[89px] shrink-0">
+                      <ScheduledChip job={job} />
+                    </span>
+                    <span className="w-[92px] shrink-0 truncate font-medium text-[#101828]">
+                      {job.campaign?.subject ?? "Campaign email"}
+                    </span>
+                    <span className="w-[52px] shrink-0 truncate text-[#1f2937]">
+                      {statusLabel(job)}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-[#98a2b3]">
+                      — {snippet(job.campaign?.body ?? "", 150, job.campaign?.subject)}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="w-[44px] shrink-0 pl-[9px]">
+                      <span className="inline-flex h-[14px] w-8 items-center justify-center rounded-[4px] bg-[#f3f4f6] text-[8px] font-medium text-[#5f6877]">
+                        {statusLabel(job)}
+                      </span>
+                    </span>
+                    <span className="flex min-w-0 flex-1 items-baseline gap-1.5 truncate">
+                      <span className="shrink-0 truncate font-medium text-[#101828]">
+                        {job.campaign?.subject ?? "Campaign email"}
+                      </span>
+                      <span className="truncate font-normal text-[#98a2b3]">
+                        — {snippet(job.campaign?.body ?? "", 150, job.campaign?.subject)}
+                      </span>
+                    </span>
+                  </>
+                )}
               </button>
             ))}
           </div>
@@ -150,20 +172,20 @@ export default function EmailsView({
                 key={job.id}
                 type="button"
                 onClick={() => onOpenEmail(job.id)}
-                className="flex w-full flex-col gap-1 border-b border-[#f7f8f8] px-4 py-3 text-left transition active:bg-[#fafbfa]"
+                className="flex w-full flex-col gap-1 border-b border-[#f9f9fa] px-4 py-2.5 text-left transition active:bg-[#fafbfa]"
               >
                 <div className="flex items-center gap-2">
-                  <span className="min-w-0 flex-1 truncate text-[12px] font-medium text-[#1e1e1e]">
-                    <span className="text-[#565656]">To: </span>
+                  <span className="min-w-0 flex-1 truncate text-[11.5px] font-medium text-[#101828]">
+                    <span className="font-normal text-[#475467]">To: </span>
                     {job.recipientName || job.recipientEmail}
                   </span>
                   <EmailTiming job={job} mode={mode} align="right" />
                 </div>
-                <p className="truncate text-[11.5px] text-[#565656]">
-                  <span className="font-medium text-[#1e1e1e]">
+                <p className="truncate text-[11px] text-[#565656]">
+                  <span className="font-medium text-[#101828]">
                     {job.campaign?.subject ?? "Campaign email"}
                   </span>{" "}
-                  <span className="text-[#8f8f8f]">
+                  <span className="text-[#98a2b3]">
                     — {snippet(job.campaign?.body ?? "", 90, job.campaign?.subject)}
                   </span>
                 </p>
@@ -172,7 +194,7 @@ export default function EmailsView({
           </div>
 
           {meta && meta.totalPages > 1 && (
-            <div className="flex items-center justify-between gap-3 px-4 py-3 text-[10.5px] text-[#8f8f8f]">
+            <div className="flex items-center justify-between gap-3 px-4 py-3 text-[10.5px] text-[#8f96a3]">
               <span>
                 {formatNumber(meta.total)} {isScheduled ? "scheduled" : "sent"} · page {meta.page} of{" "}
                 {meta.totalPages}
@@ -182,7 +204,7 @@ export default function EmailsView({
                   type="button"
                   onClick={() => setPage((value) => Math.max(1, value - 1))}
                   disabled={meta.page <= 1}
-                  className="grid h-7 w-7 place-items-center rounded-md border border-[#e9ebe9] text-[#565656] transition hover:bg-[#f4f7f5] disabled:opacity-40"
+                  className="grid h-7 w-7 place-items-center rounded border border-[#eaecf0] text-[#475467] transition hover:bg-[#f4f7f5] disabled:opacity-40"
                   aria-label="Previous page"
                 >
                   <Icon name="chevron-left" size={13} />
@@ -191,7 +213,7 @@ export default function EmailsView({
                   type="button"
                   onClick={() => setPage((value) => Math.min(meta.totalPages, value + 1))}
                   disabled={meta.page >= meta.totalPages}
-                  className="grid h-7 w-7 place-items-center rounded-md border border-[#e9ebe9] text-[#565656] transition hover:bg-[#f4f7f5] disabled:opacity-40"
+                  className="grid h-7 w-7 place-items-center rounded border border-[#eaecf0] text-[#475467] transition hover:bg-[#f4f7f5] disabled:opacity-40"
                   aria-label="Next page"
                 >
                   <Icon name="chevron-right" size={13} />
@@ -199,17 +221,30 @@ export default function EmailsView({
               </div>
             </div>
           )}
-
-          {isScheduled && (
-            <p className="flex items-center justify-center gap-1.5 py-4 text-[10px] text-[#a0a5a2]">
-              <Spinner size={9} className="text-brand-500" />
-              This list refreshes automatically every 20 seconds
-            </p>
-          )}
         </>
       )}
     </div>
   );
+}
+
+function ScheduledChip({ job }: { job: EmailJob }) {
+  const date = new Date(job.scheduledFor);
+  const valid = !Number.isNaN(date.getTime());
+  return (
+    <span
+      className="inline-flex h-[14px] w-[84px] items-center justify-center rounded-[3px] bg-[#ffedd4] text-[8px] font-medium text-[#ca3500]"
+      title={valid ? date.toLocaleString() : undefined}
+    >
+      {valid ? scheduledLabel(date) : "—"}
+    </span>
+  );
+}
+
+function statusLabel(job: EmailJob): string {
+  if (job.status === "SENT") return "Sent";
+  if (job.status === "FAILED") return "Failed";
+  if (job.status === "PROCESSING") return "Sending";
+  return "Scheduled";
 }
 
 function EmailTiming({

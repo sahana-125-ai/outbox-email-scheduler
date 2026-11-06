@@ -1,0 +1,12 @@
+
+{
+  "name": "outbox-project",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -k -n BACKEND,WORKER,FRONTEND \"npm --prefix backend run dev\" \"npm --prefix backend run worker\" \"npm --prefix frontend run dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
